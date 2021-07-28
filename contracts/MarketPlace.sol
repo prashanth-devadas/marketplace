@@ -3,6 +3,7 @@
 pragma solidity >=0.7.0 <0.9.0;
 
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
+import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
@@ -79,17 +80,58 @@ contract NFTMarket is ReentrancyGuard {
                 tokenPrice
         );
         
+        IERC721(nftContract).transferFrom(msg.sender, address(this), tokenId);
         
+        emit MarketItemCreated(
+            itemId,
+            nftContract,
+            tokenId,
+            msg.sender,
+            address(0),
+            tokenPrice
+        );
         
-        // emit MarketItemCreated(
-        //     itemId,
-        //     nftContract,
-        //     tokenId,
-        //     msg.sender,
-        //     address(0),
-        //     tokenPrice
-        // );
+    }
+    
+    function createMarketSale(
+        address nftContract,
+        uint256 itemId
+    )   public payable nonReentrant {
         
+        uint256 price = idToMarketItem[itemId].price;
+        uint256 tokenId = idToMarketItem[itemId].tokenId;
+        
+        require(msg.value == price, 'Please pay the asking price for the NFT to complete the purchase');
+        
+        idToMarketItem[itemId].seller.transfer(msg.value);
+        IERC721(nftContract).transferFrom(address(this), msg.sender, tokenId);
+        idToMarketItem[itemId].owner = payable(msg.sender);
+        _itemsSold.increment();
+    }
+    
+    function fetchMarketItems() public view returns (MarketItem[] memory) {
+        uint itemCount = _itemIds.current();
+        uint unsoldItemCount = itemCount - _itemsSold.current();
+        uint currentIndex = 0;
+        
+        MarketItem[] memory items = new MarketItem[](unsoldItemCount);
+        
+        for(uint i=0; i<itemCount; i++){
+            if(idToMarketItem[i+1].owner == address(0)){
+                uint currentId = idToMarketItem[i+1].itemId;
+                MarketItem storage currentItem = idToMarketItem[currentId];
+                items[currentIndex] = currentItem;
+                currentIndex+= 1;
+            }
+        }
+        
+        // MarketItem[] memory listOfTokens;
+        
+        // for(uint i; i<itemCount; i++){
+        //     listOfTokens[i] = idToMarketItem[i];
+        // }
+        
+        // return listOfTokens;
     }
     
 }
