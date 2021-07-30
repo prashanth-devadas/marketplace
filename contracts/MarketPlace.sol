@@ -125,13 +125,9 @@ contract NFTMarket is ReentrancyGuard {
             }
         }
         
-        // MarketItem[] memory listOfTokens;
+        return items;
         
-        // for(uint i; i<itemCount; i++){
-        //     listOfTokens[i] = idToMarketItem[i];
-        // }
         
-        // return listOfTokens;
     }
     
 }
