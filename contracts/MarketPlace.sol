@@ -38,6 +38,13 @@ contract NFTMarket is ReentrancyGuard {
     using Counters for Counters.Counter;
     Counters.Counter private _itemIds;
     Counters.Counter private _itemsSold;
+
+    address payable owner;
+    uint256 listingPrice = 1 ether;
+
+    constructor() {
+        owner = payable(msg.sender);
+    }
     
     struct MarketItem {
         uint itemId;
@@ -66,6 +73,7 @@ contract NFTMarket is ReentrancyGuard {
         uint256 tokenPrice
     )   public payable nonReentrant {
         require(tokenPrice > 0, "Price must be at least 1 wei");
+        require(msg.value == listingPrice, 'Price must be equal to the listingPrice');
         
         
         _itemIds.increment();
@@ -107,6 +115,7 @@ contract NFTMarket is ReentrancyGuard {
         IERC721(nftContract).transferFrom(address(this), msg.sender, tokenId);
         idToMarketItem[itemId].owner = payable(msg.sender);
         _itemsSold.increment();
+        payable(owner).transfer(listingPrice);
     }
     
     function fetchMarketItems() public view returns (MarketItem[] memory) {
