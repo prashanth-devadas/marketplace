@@ -31,12 +31,12 @@ contract NFT is ERC721URIStorage {
         return newItemId;
     }
 
-    // function burnToken(string memory tokenURI) public returns (uint){
-    //     _tokenIds.increment();
-    //     uint newItemId = _tokenIds.current();   
+    function burnToken(string memory tokenURI) public returns (uint){
+        _tokenIds.increment();
+        uint newItemId = _tokenIds.current();   
         
-    //     _burn(newItemId);
-    // }
+        _burn(newItemId);
+    }
 }
 
 
