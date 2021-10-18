@@ -31,12 +31,12 @@ contract NFT is ERC721URIStorage {
         return newItemId;
     }
 
-    function burnToken(string memory tokenURI) public returns (uint){
-        _tokenIds.increment();
-        uint newItemId = _tokenIds.current();   
+    // function burnToken(string memory tokenURI) public returns (uint){
+    //     _tokenIds.increment();
+    //     uint newItemId = _tokenIds.current();   
         
-        _burn(newItemId);
-    }
+    //     _burn(newItemId);
+    // }
 }
 
 
@@ -59,6 +59,14 @@ contract NFTMarket is ReentrancyGuard {
         uint256 tokenId;
         address payable seller;
         address payable owner;
+        uint256 price;
+    }
+
+    struct MarketUnsoldItem {
+        uint itemId;
+        address nftContract;
+        uint256 tokenId;
+        address payable seller
         uint256 price;
     }
     
